@@ -7,6 +7,7 @@ services:
       DB_DATABASE: /var/www/html/database/data/database.sqlite
     volumes:
       - people-data:/var/www/html/database/data
+      - ./roster:/var/www/html/roster:ro
 
 volumes:
   people-data:

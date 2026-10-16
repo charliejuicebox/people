@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Behind a hosting proxy (staging), trust it so links and cookies use https.
+        if ($proxies = env('TRUSTED_PROXIES')) {
+            $middleware->trustProxies(at: $proxies);
+        }
         $middleware->web(append: [SetLocale::class]);
         $middleware->alias(['role' => EnsureRole::class]);
         $middleware->redirectGuestsTo(fn () => route('login'));

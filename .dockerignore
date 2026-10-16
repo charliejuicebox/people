@@ -11,3 +11,6 @@ storage/logs/*
 storage/framework/cache/data/*
 storage/framework/sessions/*
 storage/framework/views/*
+
+# Real staff data never goes into an image; docker-compose mounts it locally.
+roster
