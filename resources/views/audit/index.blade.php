@@ -1,7 +1,7 @@
 <x-layouts.app :title="__('Audit log')">
     <div class="flex items-end justify-between mb-6">
         <div>
-            <h1 class="text-2xl font-semibold">{{ __('Audit log') }}</h1>
+            <h1 class="text-3xl md:text-4xl font-medium">{{ __('Audit log') }}</h1>
             <p class="muted">{{ __('Every sign-in, view, change, share, acknowledgement and export. Entries cannot be edited or deleted.') }}</p>
         </div>
         <a href="{{ route('audit.export', request()->query()) }}" class="btn-secondary">{{ __('Export CSV') }}</a>

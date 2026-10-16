@@ -1,6 +1,6 @@
 <x-layouts.app :title="__('People')">
     <div class="flex items-end justify-between mb-6">
-        <h1 class="text-2xl font-semibold">{{ $user->seesEveryone() ? __('People') : __('My team') }}</h1>
+        <h1 class="text-3xl md:text-4xl font-medium">{{ $user->seesEveryone() ? __('People') : __('My team') }}</h1>
         @if ($user->seesEveryone())
             <form class="flex gap-2">
                 <select name="entity" class="input w-auto" onchange="this.form.submit()">
@@ -32,7 +32,7 @@
             <tbody class="divide-y divide-stone-100">
                 @forelse ($people as $person)
                     <tr>
-                        <td class="px-5 py-3"><a href="{{ route('people.show', $person) }}" class="font-medium hover:text-juice-700">{{ $person->name }}</a> <span class="badge bg-stone-100 text-stone-600">{{ $person->entity }}</span></td>
+                        <td class="px-5 py-3"><a href="{{ route('people.show', $person) }}" class="font-medium hover:underline">{{ $person->name }}</a> <span class="badge bg-stone-100 text-stone-600">{{ $person->entity }}</span></td>
                         <td class="px-5 py-3 text-stone-600">{{ $person->job_title }}</td>
                         <td class="px-5 py-3 text-stone-600">{{ $person->department?->name }}</td>
                         <td class="px-5 py-3 text-stone-600">{{ $person->teamLead?->name ?? '—' }}</td>

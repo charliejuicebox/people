@@ -4,22 +4,53 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/* Juicebox brand: black and white, warm greys, one olive accent, a tight grotesk. */
 @theme {
-    --font-sans: ui-sans-serif, system-ui, sans-serif;
-    --color-juice-50: #fff7ed;
-    --color-juice-100: #ffedd5;
-    --color-juice-500: #f97316;
-    --color-juice-600: #ea580c;
-    --color-juice-700: #c2410c;
+    --font-sans: 'Inter Tight', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+    /* "juice" is the action colour: ink black, with warm paper tints. */
+    --color-juice-50: #f1f0eb;
+    --color-juice-100: #e5e3db;
+    --color-juice-500: #b3ae5a;
+    --color-juice-600: #0b0b0b;
+    --color-juice-700: #000000;
+
+    /* Olive accent from the brand platform. */
+    --color-olive-50: #f6f5e8;
+    --color-olive-100: #ebe9cc;
+    --color-olive-300: #d0cc8f;
+    --color-olive-500: #b3ae5a;
+    --color-olive-700: #77732f;
+    --color-olive-900: #45431c;
+
+    /* Warm greys (the brand's grey type and the dark "01" numerals). */
+    --color-stone-50: #f7f7f4;
+    --color-stone-100: #efeeea;
+    --color-stone-200: #e2e1dc;
+    --color-stone-300: #cfcec7;
+    --color-stone-400: #a9a8a0;
+    --color-stone-500: #8a8981;
+    --color-stone-600: #66655e;
+    --color-stone-700: #44433e;
+    --color-stone-800: #2a2a27;
+    --color-stone-900: #111110;
+}
+
+@layer base {
+    h1 { letter-spacing: -0.03em; }
+    h2 { letter-spacing: -0.01em; }
 }
 
 @layer components {
-    .card { @apply bg-white rounded-xl border border-stone-200 shadow-sm; }
-    .btn { @apply inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition; }
-    .btn-primary { @apply inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition bg-juice-600 text-white hover:bg-juice-700; }
-    .btn-secondary { @apply inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition bg-white border border-stone-300 text-stone-700 hover:bg-stone-50; }
-    .label { @apply block text-sm font-medium text-stone-700 mb-1; }
-    .input { @apply w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-juice-500 focus:ring-2 focus:ring-juice-100 focus:outline-none; }
+    .card { @apply bg-white rounded-lg border border-stone-200; }
+    .card-dark { @apply rounded-lg bg-black text-white; }
+    .btn { @apply inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition; }
+    .btn-primary { @apply inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition bg-black text-white hover:bg-stone-700; }
+    .btn-secondary { @apply inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition bg-white border border-stone-300 text-stone-900 hover:border-black; }
+    .label { @apply block text-sm font-medium text-stone-800 mb-1; }
+    .input { @apply w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm focus:border-black focus:ring-2 focus:ring-stone-200 focus:outline-none; }
     .badge { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium; }
     .muted { @apply text-sm text-stone-500; }
+    .eyebrow { @apply text-sm text-stone-500; }
+    .link { @apply underline decoration-stone-300 underline-offset-4 hover:decoration-black; }
 }

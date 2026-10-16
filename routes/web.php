@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/people', [PeopleController::class, 'index'])->name('people.index');
     Route::get('/people/{person}', [PeopleController::class, 'show'])->name('people.show');
+    Route::post('/people/{person}/access', [PeopleController::class, 'grantAccess'])->name('people.access.grant');
+    Route::delete('/people/{person}/access/{grant}', [PeopleController::class, 'revokeAccess'])->name('people.access.revoke');
 
     Route::post('/people/{person}/reviews', [ReviewController::class, 'start'])->name('reviews.start');
     Route::get('/reviews/{review}', [ReviewController::class, 'show'])->name('reviews.show');

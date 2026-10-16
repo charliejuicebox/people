@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Department;
 use App\Models\Feedback;
 use App\Models\Praise;
+use App\Models\RecordAccess;
 use App\Models\QuarterlyReview;
 use App\Models\User;
 use App\Support\Quarter;
@@ -141,5 +142,14 @@ class DatabaseSeeder extends Seeder
             'message' => 'Rebuilt the reporting dashboard with the new tools in record time.',
             'slack_error' => 'Slack not configured',
         ]);
+
+        // Cross-border access: people besides the team lead who need to see someone's reviews.
+        foreach ([
+            [$people[1], $cxLead, 'AU account lead on her main client'],
+            [$people[0], $cxLead, 'AU account lead on his main client'],
+            [$people[2], $growthLead, 'Works in the Bali growth pod'],
+        ] as [$person, $viewer, $reason]) {
+            RecordAccess::create(['person_id' => $person->id, 'user_id' => $viewer->id, 'reason' => $reason, 'granted_by' => $hrAu->id]);
+        }
     }
 }

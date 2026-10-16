@@ -52,7 +52,8 @@ class DashboardController extends Controller
             return $query->whereNotNull('team_lead_id')->get();
         }
 
-        return $query->where('team_lead_id', $user->id)->get();
+        return $query->where(fn ($q) => $q->where('team_lead_id', $user->id)
+            ->orWhereIn('id', $user->sharedAccess()->select('person_id')))->get();
     }
 
     private function summarise(Collection $rows): array

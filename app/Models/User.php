@@ -49,6 +49,18 @@ class User extends Authenticatable
         return $this->hasMany(User::class, 'team_lead_id');
     }
 
+    /** Grants letting other people (besides the team lead) read this person's records. */
+    public function accessGrants(): HasMany
+    {
+        return $this->hasMany(RecordAccess::class, 'person_id');
+    }
+
+    /** Grants letting this user read other people's records. */
+    public function sharedAccess(): HasMany
+    {
+        return $this->hasMany(RecordAccess::class, 'user_id');
+    }
+
     public function identities(): HasMany
     {
         return $this->hasMany(SocialIdentity::class);
@@ -95,15 +107,33 @@ class User extends Authenticatable
         return $person->team_lead_id !== null && $person->team_lead_id === $this->id;
     }
 
+    /** Has this user been given extra access to $person's records (cross-border ops, account leads)? */
+    public function hasSharedAccessTo(User $person): bool
+    {
+        return $this->sharedAccess()->where('person_id', $person->id)->exists();
+    }
+
     /** Can this user read performance records (reviews, feedback) about $person? */
     public function canSeeRecordsOf(User $person): bool
     {
-        return $this->id === $person->id || $this->seesEveryone() || $this->leads($person);
+        return $this->id === $person->id || $this->seesEveryone() || $this->leads($person) || $this->hasSharedAccessTo($person);
+    }
+
+    /** HR and directors decide who else can see someone's records. Admins can't, so they can't grant themselves access. */
+    public function managesAccess(): bool
+    {
+        return $this->seesEveryone();
     }
 
     public function hasReports(): bool
     {
         return $this->directReports()->exists();
+    }
+
+    /** Leads someone, or has been given access to someone else's records. */
+    public function hasPeopleToSee(): bool
+    {
+        return $this->hasReports() || $this->sharedAccess()->exists();
     }
 
     public function entityName(): string

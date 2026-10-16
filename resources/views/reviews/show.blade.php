@@ -7,8 +7,8 @@
 <x-layouts.app :title="__(':name, :quarter review', ['name' => $review->employee->name, 'quarter' => $review->period()->label()])">
     <div class="flex items-start justify-between mb-6">
         <div>
-            <p class="muted"><a href="{{ route('people.show', $review->employee) }}" class="hover:text-juice-700">{{ $review->employee->name }}</a> · {{ $review->employee->department?->name }} · {{ $review->employee->entity }}</p>
-            <h1 class="text-2xl font-semibold">{{ __('Quarterly review') }} / {{ __('Tinjauan Kuartalan') }} · {{ $review->period()->label() }}</h1>
+            <p class="muted"><a href="{{ route('people.show', $review->employee) }}" class="hover:underline">{{ $review->employee->name }}</a> · {{ $review->employee->department?->name }} · {{ $review->employee->entity }}</p>
+            <h1 class="text-3xl md:text-4xl font-medium">{{ __('Quarterly review') }} / {{ __('Tinjauan Kuartalan') }} · {{ $review->period()->label() }}</h1>
             <p class="muted">{{ __('Team lead') }}: {{ $review->reviewer?->name ?? '—' }}</p>
         </div>
         <x-status-badge :review="$review" class="text-sm" />
@@ -114,7 +114,7 @@
                 <p class="font-medium">{{ __('Ready to share with :name?', ['name' => $review->employee->firstName()]) }}</p>
                 <p class="muted">{{ __('Save your changes first. Once shared, they can read it, add their reflection and acknowledge it.') }}</p>
                 @if ($review->needsNoSurprisesConfirmation())
-                    <label class="mt-3 flex items-start gap-2 text-amber-900 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <label class="mt-3 flex items-start gap-2 text-stone-900 bg-olive-50 border border-olive-300 rounded-lg p-3">
                         <input type="checkbox" name="confirm_expectation_communicated" value="1" class="mt-0.5">
                         <span>{{ __('This is a below-expectations rating and last quarter\'s review raised no concern. I confirm I have clearly told :name what was expected and where they fell short. HR will be notified.', ['name' => $review->employee->firstName()]) }}</span>
                     </label>
@@ -125,7 +125,7 @@
     @endcan
 
     @can('acknowledge', $review)
-        <form method="POST" action="{{ route('reviews.acknowledge', $review) }}" class="card p-5 mt-6 border-blue-200 bg-blue-50">
+        <form method="POST" action="{{ route('reviews.acknowledge', $review) }}" class="card p-5 mt-6 border-olive-300 bg-olive-50">
             @csrf
             <p class="font-medium text-sm">{{ __('Acknowledge this review') }} / Konfirmasi tinjauan ini</p>
             <p class="muted mb-3">{{ __('Acknowledging means you have read and discussed this review. It does not mean you agree with everything. Add a comment if you want to.') }}</p>
@@ -137,6 +137,6 @@
     <div class="mt-6 muted text-xs space-x-3">
         @if ($review->shared_at)<span>{{ __('Shared') }} {{ $review->shared_at->timezone(config('people.timezone'))->format('j M Y H:i') }}</span>@endif
         @if ($review->acknowledged_at)<span>{{ __('Acknowledged') }} {{ $review->acknowledged_at->timezone(config('people.timezone'))->format('j M Y H:i') }}</span>@endif
-        @if ($review->flagged_to_hr_at)<span class="text-amber-700">{{ __('Flagged to HR') }} {{ $review->flagged_to_hr_at->timezone(config('people.timezone'))->format('j M Y') }}</span>@endif
+        @if ($review->flagged_to_hr_at)<span class="text-olive-700">{{ __('Flagged to HR') }} {{ $review->flagged_to_hr_at->timezone(config('people.timezone'))->format('j M Y') }}</span>@endif
     </div>
 </x-layouts.app>

@@ -1,8 +1,8 @@
 <x-layouts.app :title="__('Dashboard')">
     <div class="flex items-end justify-between mb-6">
         <div>
-            <h1 class="text-2xl font-semibold">{{ __('Hi :name', ['name' => $user->firstName()]) }}</h1>
-            <p class="muted">{{ $quarter->label() }} · {{ trans_choice(':count day left in the quarter|:count days left in the quarter', max($daysLeft, 0)) }}</p>
+            <h1 class="text-4xl md:text-5xl font-medium">{{ __('Hi :name', ['name' => $user->firstName()]) }}</h1>
+            <p class="muted mt-2">{{ $quarter->label() }} · {{ trans_choice(':count day left in the quarter|:count days left in the quarter', max($daysLeft, 0)) }}</p>
         </div>
         <div class="flex gap-2">
             <a href="{{ route('feedback.index') }}" class="btn-secondary">{{ __('Give feedback') }}</a>
@@ -11,11 +11,11 @@
     </div>
 
     @if ($toAcknowledge->isNotEmpty())
-        <div class="card p-5 mb-6 border-blue-200 bg-blue-50">
+        <div class="card-dark p-5 mb-6">
             @foreach ($toAcknowledge as $review)
                 <div class="flex items-center justify-between">
                     <p class="text-sm"><strong>{{ __('Your :quarter review is ready.', ['quarter' => $review->period()->label()]) }}</strong> {{ __('Read it, add your comments and acknowledge it.') }}</p>
-                    <a href="{{ route('reviews.show', $review) }}" class="btn-primary">{{ __('Open review') }}</a>
+                    <a href="{{ route('reviews.show', $review) }}" class="btn bg-white text-black hover:bg-olive-100">{{ __('Open review') }}</a>
                 </div>
             @endforeach
         </div>
@@ -24,14 +24,14 @@
     @if ($rows->isNotEmpty())
         <div class="grid gap-4 sm:grid-cols-4 mb-6">
             @foreach ([
-                ['label' => __('Acknowledged'), 'value' => $summary['acknowledged'], 'class' => 'text-green-700'],
-                ['label' => __('Waiting for acknowledgement'), 'value' => $summary['shared'], 'class' => 'text-blue-700'],
-                ['label' => __('Draft'), 'value' => $summary['draft'], 'class' => 'text-amber-700'],
-                ['label' => __('Not started'), 'value' => $summary['not_started'], 'class' => 'text-stone-700'],
+                ['label' => __('Acknowledged'), 'value' => $summary['acknowledged'], 'class' => 'text-black'],
+                ['label' => __('Waiting for acknowledgement'), 'value' => $summary['shared'], 'class' => 'text-olive-700'],
+                ['label' => __('Draft'), 'value' => $summary['draft'], 'class' => 'text-stone-600'],
+                ['label' => __('Not started'), 'value' => $summary['not_started'], 'class' => 'text-stone-400'],
             ] as $stat)
-                <div class="card p-4">
+                <div class="card p-5">
                     <p class="muted">{{ $stat['label'] }}</p>
-                    <p class="text-2xl font-semibold {{ $stat['class'] }}">{{ $stat['value'] }}</p>
+                    <p class="text-5xl font-medium tracking-tight mt-3 {{ $stat['class'] }}">{{ $stat['value'] }}</p>
                 </div>
             @endforeach
         </div>
@@ -64,7 +64,7 @@
                     <tr>
                         <th class="px-5 py-2 font-medium">{{ __('Person') }}</th>
                         <th class="px-5 py-2 font-medium">{{ __('Department') }}</th>
-                        @if ($user->seesEveryone())<th class="px-5 py-2 font-medium">{{ __('Team lead') }}</th>@endif
+                        <th class="px-5 py-2 font-medium">{{ __('Team lead') }}</th>
                         <th class="px-5 py-2 font-medium">{{ __('Status') }}</th>
                         <th class="px-5 py-2"></th>
                     </tr>
@@ -72,15 +72,16 @@
                 <tbody class="divide-y divide-stone-100">
                     @foreach ($rows as $row)
                         <tr>
-                            <td class="px-5 py-3"><a href="{{ route('people.show', $row['person']) }}" class="font-medium hover:text-juice-700">{{ $row['person']->name }}</a> <span class="badge bg-stone-100 text-stone-600">{{ $row['person']->entity }}</span></td>
+                            <td class="px-5 py-3"><a href="{{ route('people.show', $row['person']) }}" class="font-medium hover:underline">{{ $row['person']->name }}</a> <span class="badge bg-stone-100 text-stone-600">{{ $row['person']->entity }}</span></td>
                             <td class="px-5 py-3 text-stone-600">{{ $row['person']->department?->name }}</td>
-                            @if ($user->seesEveryone())<td class="px-5 py-3 text-stone-600">{{ $row['person']->teamLead?->name }}</td>@endif
+                            <td class="px-5 py-3 text-stone-600">{{ $row['person']->team_lead_id === $user->id ? __('You') : $row['person']->teamLead?->name }}
+                                @if (! $user->seesEveryone() && $row['person']->team_lead_id !== $user->id)<span class="badge bg-olive-100 text-olive-900 ml-1">{{ __('Shared with you') }}</span>@endif</td>
                             <td class="px-5 py-3"><x-status-badge :review="$row['review']" /></td>
                             <td class="px-5 py-3 text-right">
                                 @if ($row['review'])
-                                    <a href="{{ route('reviews.show', $row['review']) }}" class="text-juice-700 hover:underline">{{ __('Open') }}</a>
+                                    <a href="{{ route('reviews.show', $row['review']) }}" class="link">{{ __('Open') }}</a>
                                 @elseif ($user->can('create', [\App\Models\QuarterlyReview::class, $row['person']]))
-                                    <form method="POST" action="{{ route('reviews.start', $row['person']) }}">@csrf<button class="text-juice-700 hover:underline">{{ __('Start review') }}</button></form>
+                                    <form method="POST" action="{{ route('reviews.start', $row['person']) }}">@csrf<button class="link">{{ __('Start review') }}</button></form>
                                 @endif
                             </td>
                         </tr>
@@ -94,7 +95,7 @@
         <div class="card p-5">
             <h2 class="font-medium mb-3">{{ __('My reviews') }}</h2>
             @forelse ($myReviews as $review)
-                <a href="{{ route('reviews.show', $review) }}" class="flex justify-between py-2 border-b border-stone-100 last:border-0 text-sm hover:text-juice-700">
+                <a href="{{ route('reviews.show', $review) }}" class="flex justify-between py-2 border-b border-stone-100 last:border-0 text-sm hover:underline">
                     <span>{{ $review->period()->label() }}</span><x-status-badge :review="$review" />
                 </a>
             @empty
