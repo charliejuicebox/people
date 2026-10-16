@@ -52,6 +52,20 @@ class CommandsTest extends PeopleTestCase
         $this->assertSame([User::where('email', 'v2@example.test')->value('id')], $member->accessGrants()->pluck('user_id')->all());
     }
 
+    public function test_add_tester_creates_a_person_who_can_sign_in(): void
+    {
+        $this->artisan('people:add-tester', ['email' => 'Tester@Example.com.au', 'name' => 'Test Director'])
+            ->assertSuccessful();
+
+        $tester = User::where('email', 'tester@example.com.au')->first();
+        $this->assertSame('director', $tester->role);
+        $this->assertSame('AU', $tester->entity);
+        $this->assertSame('google', $tester->sign_in_provider);
+
+        $this->artisan('people:add-tester', ['email' => 'tester@example.com.au', 'name' => 'Test Director', '--role' => 'boss'])
+            ->assertFailed();
+    }
+
     public function test_roster_import_rejects_bad_rows_and_imports_nothing(): void
     {
         $csv = tempnam(sys_get_temp_dir(), 'roster');

@@ -20,6 +20,40 @@ The first run takes a few minutes. When it says `Server running`, open http://lo
 To load the real team instead of the demo people, put the roster file at `roster/roster.csv` before the first run (or run `docker compose down -v` to start fresh). The `roster/` folder is never committed to git.
 Ctrl+C stops it; `docker compose up` starts it again with your data kept. `docker compose down -v` wipes the data and reseeds next time.
 
+## Staging site (Fly.io)
+
+Staging runs the same Docker image with **dummy people only**: the `roster/` folder is never built into the image. The demo sign-in is off, so people sign in with their real Google (AU) or Microsoft (ID) account. Only people added as testers can get in.
+
+### 1. Create the two sign-in apps (one-off, needs the admins)
+
+Callback URLs use the staging address, `https://jb-people-staging.fly.dev`.
+
+- **Google (AU)**, by a Google Workspace admin: Google Cloud Console → APIs & Services → Credentials → Create OAuth client ID → Web application. Authorised redirect URI: `https://jb-people-staging.fly.dev/auth/google/callback`. Set the consent screen to *Internal*. Keep the client ID and secret.
+- **Microsoft (ID)**, by a Microsoft 365 admin: Entra admin centre → App registrations → New registration → single tenant. Redirect URI (Web): `https://jb-people-staging.fly.dev/auth/microsoft/callback`. Then Certificates & secrets → New client secret. Keep the application (client) ID, the secret value and the directory (tenant) ID.
+
+### 2. Launch (from this folder)
+
+```
+brew install flyctl
+fly auth login
+fly launch --no-deploy --copy-config --name jb-people-staging
+fly volumes create people_data --size 1 --region sin
+fly secrets set APP_KEY=base64:$(openssl rand -base64 32) \
+  GOOGLE_CLIENT_ID=... GOOGLE_CLIENT_SECRET=... \
+  MICROSOFT_CLIENT_ID=... MICROSOFT_CLIENT_SECRET=... MICROSOFT_TENANT_ID=...
+fly deploy
+```
+
+If the name `jb-people-staging` is taken, pick another and use it in `APP_URL` in `fly.toml` and in both redirect URIs.
+
+### 3. Add testers
+
+```
+fly ssh console -C "php artisan people:add-tester you@juicebox.co.id 'Your Name' --role=director"
+```
+
+Roles: `employee`, `team_lead`, `director`, `hr`, `admin`. A director or HR tester sees all the dummy people. After the first launch, `fly deploy` ships the latest code.
+
 ## Run it without Docker
 
 ```sh
