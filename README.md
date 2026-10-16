@@ -6,7 +6,20 @@ Standalone Laravel 13 app (PHP 8.3+, SQLite by default, Tailwind v4 via Vite).
 > **Dummy data only until the CTO review.** The seeder uses fake people at `example-au.test` / `example-id.test`.
 > Load the real roster with `people:import-roster` only after the review is signed off.
 
-## Run it locally
+## Run it with Docker (easiest)
+
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and open it.
+2. In Terminal, go to this folder (type `cd `, drag the folder in from Finder, press Enter).
+3. Run:
+
+```sh
+docker compose up --build
+```
+
+The first run takes a few minutes. When it says `Server running`, open http://localhost:8000 and pick someone from the demo login list.
+Ctrl+C stops it; `docker compose up` starts it again with your data kept. `docker compose down -v` wipes the data and reseeds next time.
+
+## Run it without Docker
 
 ```sh
 composer install
