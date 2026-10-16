@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Department;
+use App\Models\RecordAccess;
 use App\Models\User;
 use App\Services\Audit;
 use Illuminate\Console\Command;
@@ -13,6 +14,8 @@ use Illuminate\Validation\Rule;
 /**
  * Imports or updates people from a roster CSV (see docs/roster-template.csv).
  * Matches on employee_id. Team leads are linked by email in a second pass.
+ * Optional column viewable_by_emails (separated by ;) gives those people read access
+ * to the person's reviews and feedback, on top of the team lead.
  */
 class ImportRoster extends Command
 {
@@ -24,6 +27,8 @@ class ImportRoster extends Command
         'employee_id', 'full_name', 'work_email', 'entity', 'department', 'job_title', 'team_lead_email',
         'role', 'employment_type', 'start_date', 'contract_end_date', 'sign_in',
     ];
+
+    private const ROSTER_REASON = 'From the roster';
 
     public function handle(): int
     {
@@ -106,6 +111,37 @@ class ImportRoster extends Command
                     $this->warn("No team lead found with email {$row['team_lead_email']} (for {$row['full_name']}).");
                 }
                 User::where('employee_id', $row['employee_id'])->update(['team_lead_id' => $lead?->id]);
+            }
+
+            foreach ($rows as $row) {
+                if (! array_key_exists('viewable_by_emails', $row)) {
+                    continue;
+                }
+                $person = User::where('employee_id', $row['employee_id'])->first();
+                $viewerIds = collect(preg_split('/[;,]/', $row['viewable_by_emails']))
+                    ->map(fn ($e) => strtolower(trim($e)))->filter()
+                    ->map(function ($email) use ($row) {
+                        $viewer = User::where('email', $email)->first();
+                        if (! $viewer) {
+                            $this->warn("No one found with email {$email} (viewable by, for {$row['full_name']}).");
+                        }
+
+                        return $viewer?->id;
+                    })
+                    ->filter()
+                    // The person and their team lead already have access.
+                    ->reject(fn ($id) => $id === $person->id || $id === $person->team_lead_id)
+                    ->unique();
+
+                // The roster is the source of truth for roster-granted access; grants added in the app stay.
+                RecordAccess::where('person_id', $person->id)->where('reason', self::ROSTER_REASON)
+                    ->whereNotIn('user_id', $viewerIds)->delete();
+                foreach ($viewerIds as $viewerId) {
+                    RecordAccess::firstOrCreate(
+                        ['person_id' => $person->id, 'user_id' => $viewerId],
+                        ['reason' => self::ROSTER_REASON],
+                    );
+                }
             }
         });
 

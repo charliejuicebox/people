@@ -25,3 +25,6 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Real roster files stay out of git (names and emails of real staff)
+/roster/

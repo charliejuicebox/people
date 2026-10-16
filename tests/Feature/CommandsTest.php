@@ -27,6 +27,31 @@ class CommandsTest extends PeopleTestCase
         $this->assertSame('2026-12-31', $member->contract_end_date->toDateString());
     }
 
+    public function test_roster_import_gives_viewable_by_access_and_keeps_it_in_sync(): void
+    {
+        $csv = tempnam(sys_get_temp_dir(), 'roster');
+        $write = fn (string $viewers) => file_put_contents($csv, implode("\n", [
+            'employee_id,full_name,work_email,entity,department,job_title,team_lead_email,role,employment_type,start_date,contract_end_date,sign_in,viewable_by_emails',
+            'L1,Lead Person,lead@example.test,AU,Tech,Tech Lead,,team_lead,,,,google,',
+            'V1,Viewer One,v1@example.test,AU,Tech,CTO,,team_lead,,,,google,',
+            'V2,Viewer Two,v2@example.test,AU,Tech,Director,,director,,,,google,',
+            "E1,Team Member,member@example.test,ID,Tech,Developer,lead@example.test,employee,,,,microsoft,\"{$viewers}\"",
+        ]));
+
+        $write('lead@example.test; v1@example.test; v2@example.test; member@example.test');
+        $this->artisan('people:import-roster', ['file' => $csv])->assertSuccessful();
+        $member = User::where('employee_id', 'E1')->first();
+        $this->assertEqualsCanonicalizing(
+            User::whereIn('email', ['v1@example.test', 'v2@example.test'])->pluck('id')->all(),
+            $member->accessGrants()->pluck('user_id')->all(),
+        );
+        $this->assertTrue(User::where('email', 'v1@example.test')->first()->canSeeRecordsOf($member));
+
+        $write('v2@example.test');
+        $this->artisan('people:import-roster', ['file' => $csv])->assertSuccessful();
+        $this->assertSame([User::where('email', 'v2@example.test')->value('id')], $member->accessGrants()->pluck('user_id')->all());
+    }
+
     public function test_roster_import_rejects_bad_rows_and_imports_nothing(): void
     {
         $csv = tempnam(sys_get_temp_dir(), 'roster');

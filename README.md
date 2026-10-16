@@ -17,6 +17,7 @@ docker compose up --build
 ```
 
 The first run takes a few minutes. When it says `Server running`, open http://localhost:8000 and pick someone from the demo login list.
+To load the real team instead of the demo people, put the roster file at `roster/roster.csv` before the first run (or run `docker compose down -v` to start fresh). The `roster/` folder is never committed to git.
 Ctrl+C stops it; `docker compose up` starts it again with your data kept. `docker compose down -v` wipes the data and reseeds next time.
 
 ## Run it without Docker
@@ -82,7 +83,7 @@ php artisan people:import-roster roster.csv --dry-run
 php artisan people:import-roster roster.csv
 ```
 
-Columns follow `roster-template.csv` in the repo root (employee_id, full_name, work_email, entity, department, job_title, team_lead_email, role, employment_type, start_date, contract_end_date, sign_in).
+Columns follow `roster-template.csv` in the repo root (employee_id, full_name, work_email, entity, department, job_title, team_lead_email, role, employment_type, start_date, contract_end_date, sign_in, plus optional viewable_by_emails: extra people, separated by `;`, who can read that person's reviews).
 Every row is validated first; nothing is written if any row fails.
 
 ## Production

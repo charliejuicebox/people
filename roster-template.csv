@@ -1,3 +1,3 @@
-employee_id,full_name,work_email,entity,department,job_title,team_lead_email,role,employment_type,start_date,contract_end_date,sign_in
-JB001,Example Person,example.person@juicebox.com.au,AU,Tech Team,Front End Developer,lead.person@juicebox.com.au,employee,permanent_full_time,2024-03-01,,google
-JB002,Contoh Orang,contoh.orang@juicebox.co.id,ID,Growth,SEO Specialist,lead.person@juicebox.com.au,employee,PKWT,2025-01-06,2026-12-31,microsoft
+employee_id,full_name,work_email,entity,department,job_title,team_lead_email,role,employment_type,start_date,contract_end_date,sign_in,viewable_by_emails
+JB001,Example Person,example.person@juicebox.com.au,AU,Tech Team,Front End Developer,lead.person@juicebox.com.au,employee,permanent_full_time,2024-03-01,,google,
+JB002,Contoh Orang,contoh.orang@juicebox.co.id,ID,Growth,SEO Specialist,lead.person@juicebox.com.au,employee,PKWT,2025-01-06,2026-12-31,microsoft,cto@juicebox.com.au;account.lead@juicebox.com.au

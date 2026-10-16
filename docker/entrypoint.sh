@@ -11,7 +11,13 @@ fi
 mkdir -p database/data
 if [ ! -f database/data/database.sqlite ]; then
     touch database/data/database.sqlite
-    php artisan migrate --seed --force
+    if [ -f roster/roster.csv ]; then
+        # A real roster was dropped in: load it instead of the dummy demo people.
+        php artisan migrate --force
+        php artisan people:import-roster roster/roster.csv
+    else
+        php artisan migrate --seed --force
+    fi
 else
     php artisan migrate --force
 fi
